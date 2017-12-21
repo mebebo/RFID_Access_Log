@@ -48,7 +48,7 @@ DS1302 rtc(rsPin, datPin, clkPin);
 
 
 // PINOUT
-int relay = 00000;
+int relay = 7;
 int piezo = 00000;
 int ledR = 00000, ledG = 00000, ledB = 00000;
 
@@ -67,8 +67,7 @@ void setup() {
   pinMode(ledG, OUTPUT);
   pinMode(ledB, OUTPUT);
 
-  pinMode(13, OUTPUT);
-  digitalWrite(13, LOW);
+
 
   initSD();
 
@@ -93,13 +92,6 @@ void loop() {
     Serial.println(matchID);
   }
 
-
-  //    if (0) {
-  //      digitalWrite(13, HIGH);
-  //      writeLogSD(rtc.getDateStr(), rtc.getTimeStr(), keyInput);
-  //    }
-  //
-  //    if (keyInput == "reset") digitalWrite(13, LOW);
 }
 
 

@@ -16,6 +16,8 @@ void initSD() {
 
 boolean validateAccessSD(String key) {
   String line = "";
+  String reset = "reset";
+  reset = reset.substring(0, reset.length());
 
   if (SD.exists(accessKeys)) {
     accessKeysFile = SD.open(accessKeys, FILE_READ);
@@ -30,45 +32,23 @@ boolean validateAccessSD(String key) {
         line = line.substring(0, line.length() - 1);
         Serial.println(line);
 
-        if (line == key) {
+        if (key == line) {
           // ID MATCH HERE ====================================================================
-          Serial.println("Access GRANTED");
-          accessKeysFile.close();
+          validateEntry(key);
 
+          Serial.println("Access GRANTED");
+
+          accessKeysFile.close();
           return true;
         }
+
+        else if(key == reset) {
+          digitalWrite(relay, LOW);
+          Serial.println("Resettened");
+        }
+
         line = "";
       }
-
-      //      String line = accessKeysFile.readStringUntil('\n')+ "\0";
-      //
-      //      Serial.println(line);
-      //      Serial.println(line == key);
-      //
-      //      if (line == key) {
-      //        Serial.println("Access GRANTED");
-      //        accessKeysFile.close();
-      //        return true;
-      //      }
-
-
-      //      char ltr = accessKeysFile.read();
-      //
-      //      if (ltr != '\n') {
-      //        line += ltr;
-      //      }
-      //      else if (ltr == '\n') {
-      //        line += '\0';
-      //        Serial.println(line);
-      //        if (line == "fishes") {
-      //          // ID MATCH HERE ====================================================================
-      //          Serial.println("Access GRANTED");
-      //          accessKeysFile.close();
-      //
-      //          return true;
-      //        }
-      //        line = "";
-      //      }
     }
     Serial.println("Access DENIED");
     accessKeysFile.close();
@@ -76,6 +56,7 @@ boolean validateAccessSD(String key) {
   else Serial.println("Access Keys File Not Found");
   return false;
 }
+
 
 void writeLogSD(String _date, String _time, String _id) {
 
