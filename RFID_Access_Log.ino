@@ -29,18 +29,34 @@
 // Set date + time
 
 // SD Card
-// Sync Access Keys 
+// Sync Access Keys
 // Sync Log Entries
 
+// PROBLEMS
+// No SD Card
+// No GPRS Connection
 
 
 
+
+
+
+// CLOCK MODULE
+#include <DS1302.h>
+int rsPin = 2, datPin = 3, clkPin = 4;
+DS1302 rtc(rsPin, datPin, clkPin);
+
+
+// PINOUT
 int relay = 00000;
 int piezo = 00000;
 int ledR = 00000, ledG = 00000, ledB = 00000;
 
 
-boolean setDateNTime = true;
+
+
+boolean setDateNTime = false;
+
 
 void setup() {
   Serial.begin(9600);
@@ -51,6 +67,11 @@ void setup() {
   pinMode(ledG, OUTPUT);
   pinMode(ledB, OUTPUT);
 
+  pinMode(13, OUTPUT);
+  digitalWrite(13, LOW);
+
+  initSD();
+
   if (setDateNTime) {
     setRTCTime(__TIME__);
     setRTCDate(__DATE__);
@@ -59,7 +80,30 @@ void setup() {
 
 void loop() {
 
-rtc.getTimeStr();
-rtc.getDateStr();  // DATE + TIME FORMAT CAN BE CHANGED
 
+  String keyInput = "";
+  while (Serial.available()) {
+    keyInput = Serial.readString();
+    keyInput = keyInput.substring(0, keyInput.length());
+
+    Serial.print("Key Input: ");
+    Serial.println(keyInput);
+
+    boolean matchID = validateAccessSD(keyInput);
+    Serial.println(matchID);
+  }
+
+
+  //    if (0) {
+  //      digitalWrite(13, HIGH);
+  //      writeLogSD(rtc.getDateStr(), rtc.getTimeStr(), keyInput);
+  //    }
+  //
+  //    if (keyInput == "reset") digitalWrite(13, LOW);
 }
+
+
+
+
+
+

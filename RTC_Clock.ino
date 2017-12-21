@@ -1,7 +1,4 @@
-#include <DS1302.h>
 
-int rsPin = 2, datPin = 3, clkPin = 4;
-DS1302 rtc(rsPin, datPin, clkPin);
 
 
 
@@ -11,7 +8,6 @@ void setRTCTime(String t) {
 
   h = t.toInt();
   t = t.substring(t.indexOf(':') + 1);
-  Serial.println(t);
   m = t.toInt();
   t = t.substring(t.indexOf(':') + 1);
   s = t.toInt();
