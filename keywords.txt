@@ -1,0 +1,4 @@
+Current		KEYWORD1
+smoothing	KEYWORD2
+readVal		KEYWORD3
+checkError	KEYWORD4

@@ -1,13 +1,42 @@
+//stop sag sol
+//far sag sol
+//sinyal sag sol
+//beacon tepe
+
+
 // COMPONENTS
 //
 // RFID reader
 // SMS Module
 // Memory Card
 // RTC Clock
+// Current Sensors
+
+// Piezo, RGB Led
 
 // FUNCTIONS
 
 // Working offline
+
+//1 - ON
+//2 - STANDBY
+//      - LED yellow
+//3 - CARD INPUT
+//      - READING CARD - LED yellow blink (nonblocking, while reading rfid and searching sd card for match)
+//  3a - ACCEPT ENTRY
+//          - LED green
+//          - RELAY on
+//          - PIEZO yes
+//          - SD LOG WRITE
+//  3b - REJECT ENTRY
+//          - LED red
+//          - PIEZO no
+//
+//          - REVERT to STANDBY
+//4 - RUNNING
+//      - LED green
+//      - RELAY on
+
 
 // Access Keys In SD Card
 // RFID Read
@@ -37,8 +66,10 @@
 // No GPRS Connection
 
 
+// CURRENT SENSORS
+#include "Current.h"
 
-
+Current headlampL("Left HeadLight", A0);
 
 
 // CLOCK MODULE
@@ -49,7 +80,7 @@ DS1302 rtc(rsPin, datPin, clkPin);
 
 // PINOUT
 int relay = 7;
-int piezo = 00000;
+int piezo = 6;
 int ledR = 00000, ledG = 00000, ledB = 00000;
 
 
@@ -63,9 +94,8 @@ void setup() {
 
   pinMode(relay, OUTPUT);
   pinMode(piezo, OUTPUT);
-  pinMode(ledR, OUTPUT);
-  pinMode(ledG, OUTPUT);
-  pinMode(ledB, OUTPUT);
+
+  initLedPins(ledR, ledG, ledB);
 
 
 
