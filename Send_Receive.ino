@@ -1,19 +1,24 @@
-
+int rejectInterval = 750;
 
 void validateEntry(String key) {
   digitalWrite(relay, HIGH);
   ledGreen();
-  writeLogSD(rtc.getDateStr(), rtc.getTimeStr(), key);
 
+  Serial.println("Access GRANTED");
   beepAccept();
+  writeLogSD(rtc.getDateStr(), rtc.getTimeStr(), key);
 }
 
 
 void rejectEntry(String key) {
-  static unsigned long redTime;
-  static boolean 
-  digitalWrite(relay, LOW);
+  Serial.println("Access DENIED");
 
-  beepReject();
+  unsigned long redTime = millis() + rejectInterval;
+  while (redTime <= millis()) {
+    ledRed();
+    digitalWrite(relay, LOW);
+    beepReject();
+  }
+  ledYellow();
 }
 

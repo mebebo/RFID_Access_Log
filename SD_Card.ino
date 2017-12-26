@@ -9,15 +9,15 @@ String entryLog = "entryLog.txt";
 String delimitor = ",";
 
 void initSD() {
-  if (SD.begin()) Serial.println("SD Card Initialized");
+  if (SD.begin(csPinSD)) Serial.println("SD Card Initialized");
   else Serial.println("SD Card Initialization Failed");
 }
 
 
 boolean validateAccessSD(String key) {
   String line = "";
-  String reset = "reset";
-  reset = reset.substring(0, reset.length());
+//  String reset = "reset";
+//  reset = reset.substring(0, reset.length());
 
   if (SD.exists(accessKeys)) {
     accessKeysFile = SD.open(accessKeys, FILE_READ);
@@ -34,23 +34,18 @@ boolean validateAccessSD(String key) {
 
         if (key == line) {
           // ID MATCH HERE ====================================================================
-          validateEntry(key);
-
-          Serial.println("Access GRANTED");
-
           accessKeysFile.close();
           return true;
         }
 
-        else if(key == reset) {
-          digitalWrite(relay, LOW);
-          Serial.println("Resettened");
-        }
+//        else if (key == reset) {
+//          digitalWrite(relay, LOW);
+//          Serial.println("Resettened");
+//        }
 
         line = "";
       }
     }
-    Serial.println("Access DENIED");
     accessKeysFile.close();
   }
   else Serial.println("Access Keys File Not Found");
@@ -72,11 +67,11 @@ void writeLogSD(String _date, String _time, String _id) {
 
   entryLogFile.close();
 
-  Serial.print(_date);
-  Serial.print(delimitor);
-  Serial.print(_time);
-  Serial.print(delimitor);
-  Serial.println(_id);
+  //  Serial.print(_date);
+  //  Serial.print(delimitor);
+  //  Serial.print(_time);
+  //  Serial.print(delimitor);
+  //  Serial.println(_id);
 }
 
 

@@ -22,7 +22,7 @@ boolean Current::checkError() {
   // Check against threshold
   currVal = average - currCalib;
   if (currVal >= currThreshold) return false;
-  else if (currval < currThreshold) {
+  else if (currVal < currThreshold) {
     return true;
   }
 }

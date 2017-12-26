@@ -1,8 +1,3 @@
-//stop sag sol
-//far sag sol
-//sinyal sag sol
-//beacon tepe
-
 
 // COMPONENTS
 //
@@ -38,19 +33,6 @@
 //      - RELAY on
 
 
-// Access Keys In SD Card
-// RFID Read
-// SD Card Access Key Check
-// Validate || Reject
-//      Relay HIGH.LED Green.PiezoSUCCESS || Decline & Relay LOW.LED Red.PiezoFAIL
-
-// LOG Entry to SD Card
-
-
-// SD Card
-// 1 - Access Keys
-// 2 - Log Entry
-
 
 
 // Online updates - Transmit & Receive
@@ -61,15 +43,25 @@
 // Sync Access Keys
 // Sync Log Entries
 
+
 // PROBLEMS
 // No SD Card
 // No GPRS Connection
+// RFID Reading Error
+// Date + Time Timezone Errors
+
 
 
 // CURRENT SENSORS
 #include "Current.h"
 
-Current headlampL("Left HeadLight", A0);
+Current headlampL("Left Headlight", A0);
+Current headlampR("Right Headlight", A1);
+Current signalL("Left Signal Light", A2);
+Current signalR("Right Signal Light", A3);
+Current taillampL("Left Tail Light", A4);
+Current taillampR("Right Tail Light", A5);
+Current beacon("Beacon Light", 00000);
 
 
 // CLOCK MODULE
@@ -82,8 +74,7 @@ DS1302 rtc(rsPin, datPin, clkPin);
 int relay = 7;
 int piezo = 6;
 int ledR = 00000, ledG = 00000, ledB = 00000;
-
-
+int csPinSD = 10;
 
 
 boolean setDateNTime = false;
@@ -95,11 +86,11 @@ void setup() {
   pinMode(relay, OUTPUT);
   pinMode(piezo, OUTPUT);
 
+  digitalWrite(relay, LOW);
+
   initLedPins(ledR, ledG, ledB);
-
-
-
   initSD();
+  ledYellow();
 
   if (setDateNTime) {
     setRTCTime(__TIME__);
@@ -107,21 +98,23 @@ void setup() {
   }
 }
 
+
 void loop() {
 
 
-  String keyInput = "";
+
   while (Serial.available()) {
-    keyInput = Serial.readString();
+    String keyInput = Serial.readString();
     keyInput = keyInput.substring(0, keyInput.length());
 
     Serial.print("Key Input: ");
     Serial.println(keyInput);
 
     boolean matchID = validateAccessSD(keyInput);
-    Serial.println(matchID);
-  }
 
+    if (matchID)    validateEntry(keyInput);
+    else if (!matchID) rejectEntry(keyInput);
+  }
 }
 
 
