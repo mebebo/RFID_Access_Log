@@ -1,4 +1,6 @@
 
+
+
 // COMPONENTS
 //
 // RFID reader
@@ -32,7 +34,7 @@
 //      - LED green
 //      - RELAY on
 
-
+// SECRET BYPASS SWITCH
 
 
 // Online updates - Transmit & Receive
@@ -63,18 +65,36 @@ Current taillampL("Left Tail Light", A4);
 Current taillampR("Right Tail Light", A5);
 Current beacon("Beacon Light", 00000);
 
+#include <SPI.h>
+
+// RFID MODULE
+#include <ByteConvert.hpp>
+#include <MFRC522.h>
+int rfidRstPin = 8;
+int rfidCSPin = 4;
+
+MFRC522 rfid(rfidCSPin, rfidRstPin);
+
+
+// SD CARD MODULE
+#include <SD.h>
+File accessKeysFile;
+File entryLogFile;
+String accessKeys = "keys.txt";
+String entryLog = "entryLog.txt";
+int sdCSPin = 10;
+
 
 // CLOCK MODULE
 #include <DS1302.h>
-int rsPin = 2, datPin = 3, clkPin = 4;
+int rsPin = 2, datPin = 3, clkPin = 00000;
 DS1302 rtc(rsPin, datPin, clkPin);
 
 
 // PINOUT
-int relay = 7;
-int piezo = 6;
-int ledR = 00000, ledG = 00000, ledB = 00000;
-int csPinSD = 10;
+int relay = 00000;
+int piezo = 6;                                    // PWM
+int ledR = 00000, ledG = 00000, ledB = 00000;     // PWM * 3
 
 
 boolean setDateNTime = false;
@@ -82,14 +102,22 @@ boolean setDateNTime = false;
 
 void setup() {
   Serial.begin(9600);
+  SPI.begin();
 
   pinMode(relay, OUTPUT);
   pinMode(piezo, OUTPUT);
 
+  pinMode(10, OUTPUT);
+  pinMode(sdCSPin, OUTPUT);
+  pinMode(rfidCSPin, OUTPUT);
+
+  digitalWrite(sdCSPin, HIGH);
+  digitalWrite(rfidCSPin, HIGH);
   digitalWrite(relay, LOW);
 
   initLedPins(ledR, ledG, ledB);
   initSD();
+  initRFID();
   ledYellow();
 
   if (setDateNTime) {
@@ -103,9 +131,8 @@ void loop() {
 
 
 
-  while (Serial.available()) {
-    String keyInput = Serial.readString();
-    keyInput = keyInput.substring(0, keyInput.length());
+  if (rfid.PICC_IsNewCardPresent()) {
+    String keyInput = getUID();
 
     Serial.print("Key Input: ");
     Serial.println(keyInput);

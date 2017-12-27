@@ -1,4 +1,3 @@
-int rejectInterval = 750;
 
 void validateEntry(String key) {
   digitalWrite(relay, HIGH);
@@ -12,6 +11,7 @@ void validateEntry(String key) {
 
 void rejectEntry(String key) {
   Serial.println("Access DENIED");
+  int rejectInterval = 750;
 
   unsigned long redTime = millis() + rejectInterval;
   while (redTime <= millis()) {

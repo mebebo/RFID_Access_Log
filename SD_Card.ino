@@ -1,23 +1,17 @@
-// SD MODULE
-#include <SPI.h>
-#include <SD.h>
-File accessKeysFile;
-File entryLogFile;
-String accessKeys = "keys.txt";
-String entryLog = "entryLog.txt";
+
 
 String delimitor = ",";
 
 void initSD() {
-  if (SD.begin(csPinSD)) Serial.println("SD Card Initialized");
+  if (SD.begin(sdCSPin)) Serial.println("SD Card Initialized");
   else Serial.println("SD Card Initialization Failed");
 }
 
 
 boolean validateAccessSD(String key) {
   String line = "";
-//  String reset = "reset";
-//  reset = reset.substring(0, reset.length());
+  //  String reset = "reset";
+  //  reset = reset.substring(0, reset.length());
 
   if (SD.exists(accessKeys)) {
     accessKeysFile = SD.open(accessKeys, FILE_READ);
@@ -38,10 +32,10 @@ boolean validateAccessSD(String key) {
           return true;
         }
 
-//        else if (key == reset) {
-//          digitalWrite(relay, LOW);
-//          Serial.println("Resettened");
-//        }
+        //        else if (key == reset) {
+        //          digitalWrite(relay, LOW);
+        //          Serial.println("Resettened");
+        //        }
 
         line = "";
       }
@@ -74,4 +68,10 @@ void writeLogSD(String _date, String _time, String _id) {
   //  Serial.println(_id);
 }
 
+
+void addAccessSD(String _key) {
+  accessKeysFile = SD.open(accessKeys, FILE_READ);
+  accessKeysFile.println(_key);
+  accessKeysFile.close();
+}
 
