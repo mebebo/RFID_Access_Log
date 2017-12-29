@@ -1,4 +1,4 @@
-
+// Shift register needed for outputs?
 
 
 // COMPONENTS
@@ -46,7 +46,7 @@
 // Sync Log Entries
 
 
-// PROBLEMS
+// POSSIBLE PROBLEMS
 // No SD Card
 // No GPRS Connection
 // RFID Reading Error
@@ -70,35 +70,53 @@ Current beacon("Beacon Light", 00000);
 // RFID MODULE
 #include <ByteConvert.hpp>
 #include <MFRC522.h>
-int rfidRstPin = 8;
-int rfidCSPin = 4;
+int rfidRstPin = 18;
+int rfidCSPin = 19;
 
 MFRC522 rfid(rfidCSPin, rfidRstPin);
 
 
 // SD CARD MODULE
-#include <SD.h>
+//#include <SD.h>
+#include "SdFat.h"
+SdFat SD;
 File accessKeysFile;
 File entryLogFile;
 String accessKeys = "keys.txt";
 String entryLog = "entryLog.txt";
-int sdCSPin = 10;
+int sdCSPin = 9;
 
 
 // CLOCK MODULE
 #include <DS1302.h>
-int rsPin = 2, datPin = 3, clkPin = 00000;
+int rsPin = 2, datPin = 4, clkPin = 7;
 DS1302 rtc(rsPin, datPin, clkPin);
 
 
 // PINOUT
-int relay = 00000;
-int piezo = 6;                                    // PWM
-int ledR = 00000, ledG = 00000, ledB = 00000;     // PWM * 3
+int relay = 8;
+int piezo = 3;                                    // PWM
+int ledR = 5, ledG = 6, ledB = 00000;     // PWM * 3
+
+//2 CLK1
+//3o PIEZO
+//4 CLK2
+//5o LED R
+//6o LED G
+//7 CLK3
+//8 RELAY
+//9o
+//10 CS SD
+//11 SPI
+//12 SPI
+//13 SPI
+//18 RES RFID
+//19 CS RFID
+//
+//Shiftables: RELAY, ledR, ledG, ledB
 
 
-boolean setDateNTime = false;
-
+boolean setDateNTime = true;
 
 void setup() {
   Serial.begin(9600);
@@ -110,6 +128,7 @@ void setup() {
   pinMode(10, OUTPUT);
   pinMode(sdCSPin, OUTPUT);
   pinMode(rfidCSPin, OUTPUT);
+  pinMode(rfidRstPin, OUTPUT);
 
   digitalWrite(sdCSPin, HIGH);
   digitalWrite(rfidCSPin, HIGH);
@@ -130,18 +149,14 @@ void setup() {
 void loop() {
 
 
-
   if (rfid.PICC_IsNewCardPresent()) {
     String keyInput = getUID();
-
-    Serial.print("Key Input: ");
-    Serial.println(keyInput);
-
     boolean matchID = validateAccessSD(keyInput);
-
-    if (matchID)    validateEntry(keyInput);
-    else if (!matchID) rejectEntry(keyInput);
+    if (matchID) grantAccess(keyInput);
+    else rejectAccess(keyInput);
+    Serial.println(keyInput);
   }
+
 }
 
 

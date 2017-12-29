@@ -1,4 +1,4 @@
-int beepInterval = 90;
+int beepInterval = 80;
 
 void beepAccept() {
   tone(piezo, 523);
@@ -29,4 +29,6 @@ void beepAlert() {
   delay(beepInterval);
   noTone(piezo);
 }
+
+
 
