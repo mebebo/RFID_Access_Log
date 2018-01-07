@@ -1,20 +1,24 @@
+String vehicleID = "HARLAN-07";
+
 // Shift register needed for outputs?
+// log out
+// current sensor
+// arduino memory to eeprom
+// saat dilimi greenwich
+// active session id variable -> Log Out ID
 
+// SIM MODULE ADDITION
+//  HTML UPDATE FUNCTION
 
-// COMPONENTS
-//
-// RFID reader
-// SMS Module
-// Memory Card
-// RTC Clock
-// Current Sensors
+//  Logged in behaviour
+// Log Out?
 
-// Piezo, RGB Led
 
 // FUNCTIONS
 
 // Working offline
 
+// FLOWCHART =============================================================================================
 //1 - ON
 //2 - STANDBY
 //      - LED yellow
@@ -45,9 +49,11 @@
 // Sync Access Keys
 // Sync Log Entries
 
+// Ability to remotely change server info
+
 
 // POSSIBLE PROBLEMS
-// No SD Card
+// No SD Card           -  Check database online, blink yellow while checking
 // No GPRS Connection
 // RFID Reading Error
 // Date + Time Timezone Errors
@@ -55,15 +61,15 @@
 
 
 // CURRENT SENSORS
-#include "Current.h"
-
-Current headlampL("Left Headlight", A0);
-Current headlampR("Right Headlight", A1);
-Current signalL("Left Signal Light", A2);
-Current signalR("Right Signal Light", A3);
-Current taillampL("Left Tail Light", A4);
-Current taillampR("Right Tail Light", A5);
-Current beacon("Beacon Light", 00000);
+//#include "Current.h"
+//
+//Current headlampL("Left Headlight", A0);
+//Current headlampR("Right Headlight", A1);
+//Current signalL("Left Signal Light", A2);
+//Current signalR("Right Signal Light", A3);
+//Current taillampL("Left Tail Light", A4);
+//Current taillampR("Right Tail Light", A5);
+//Current beacon("Beacon Light", 00000);
 
 #include <SPI.h>
 
@@ -82,9 +88,13 @@ MFRC522 rfid(rfidCSPin, rfidRstPin);
 SdFat SD;
 File accessKeysFile;
 File entryLogFile;
-String accessKeys = "keys.txt";
-String entryLog = "entryLog.txt";
-int sdCSPin = 9;
+File tempKeysFile;
+File tempLogFile;
+const char accessKeys[] = "keys.txt";
+const char entryLog[] = "entryLog.txt";
+const char tempKeys[] = "tempKeys.txt";
+const char tempLog[] = "tempLog.txt";
+int sdCSPin = 10;
 
 
 // CLOCK MODULE
@@ -113,10 +123,21 @@ int ledR = 5, ledG = 6, ledB = 00000;     // PWM * 3
 //18 RES RFID
 //19 CS RFID
 //
+//14
+//15
+//16
+//17
+
+
+//
 //Shiftables: RELAY, ledR, ledG, ledB
 
 
 boolean setDateNTime = true;
+
+boolean loggedIn = false;
+
+String currUserID = "";
 
 void setup() {
   Serial.begin(9600);
@@ -137,7 +158,6 @@ void setup() {
   initLedPins(ledR, ledG, ledB);
   initSD();
   initRFID();
-  ledYellow();
 
   if (setDateNTime) {
     setRTCTime(__TIME__);
@@ -148,15 +168,30 @@ void setup() {
 
 void loop() {
 
-
   if (rfid.PICC_IsNewCardPresent()) {
     String keyInput = getUID();
-    boolean matchID = validateAccessSD(keyInput);
-    if (matchID) grantAccess(keyInput);
-    else rejectAccess(keyInput);
-    Serial.println(keyInput);
-  }
+//    Serial.print("Current Input: ");
+//    Serial.println(keyInput);
+    boolean matchID;
 
+    if (!loggedIn) {
+      matchID = validateAccessSD(keyInput);
+      Serial.print(F("Match ID "));
+      Serial.println(matchID);
+
+      if (matchID) logIn(keyInput);
+      else rejectAccess(keyInput);
+    }
+
+    else if (loggedIn) {
+      matchID = validateLogOutSD(keyInput);
+      Serial.print(F("Match ID "));
+      Serial.println(matchID);
+
+      if(matchID) logOut(keyInput);
+      else ;
+    }
+  }
 }
 
 

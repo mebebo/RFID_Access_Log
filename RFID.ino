@@ -2,7 +2,7 @@
 
 void initRFID() {
   rfid.PCD_Init(rfidCSPin, rfidRstPin);
-  Serial.println("RFID Initialized");
+  Serial.println(F("RFID Initialized"));
 }
 
 String getUID() {
@@ -14,14 +14,6 @@ String getUID() {
   rfid.PCD_StopCrypto1();
   return uid;
 }
-
-
-
-
-
-
-
-
 
 
 

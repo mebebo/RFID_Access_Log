@@ -3,19 +3,17 @@
 String delimitor = ",";
 
 void initSD() {
-  if (SD.begin(sdCSPin)) Serial.println("SD Card Initialized");
-  else Serial.println("SD Card Initialization Failed");
+  if (SD.begin(sdCSPin)) Serial.println(F("SD Card Initialized"));
+  else Serial.println(F("SD Card Initialization Failed"));
 }
-
 
 boolean validateAccessSD(String key) {
   String line = "";
-  char filename[accessKeys.length() + 1];
-  accessKeys.toCharArray(filename, accessKeys.length() + 1);
+  Serial.println(F("Stored Access Keys: "));
 
-  if (SD.exists(filename)) {
+  if (SD.exists(accessKeys)) {
     accessKeysFile = SD.open(accessKeys, FILE_READ);
-    if (accessKeysFile.available() <= 0) Serial.println("Access Keys File Error");
+    if (accessKeysFile.available() <= 0) Serial.println(F("Access Keys File Error"));
     while (accessKeysFile.available()) {
       char ltr = accessKeysFile.read();
 
@@ -28,7 +26,7 @@ boolean validateAccessSD(String key) {
 
         if (key == line) {
           // ID MATCH HERE ====================================================================
-          //          Serial.println("MATCH");
+          //          Serial.println(F("MATCH"));
           accessKeysFile.close();
           return true;
         }
@@ -38,37 +36,76 @@ boolean validateAccessSD(String key) {
     }
     accessKeysFile.close();
   }
-  else Serial.println("Access Keys File Not Found");
+  else Serial.println(F("Access Keys File Not Found"));
   return 0;
 }
 
 
-void writeLogSD(String _date, String _time, String _id) {
-  entryLogFile = SD.open(entryLog, FILE_WRITE);
-  if (entryLogFile) {
-    entryLogFile.print(_date);
-    entryLogFile.print(delimitor);
-    entryLogFile.print(_time);
-    entryLogFile.print(delimitor);
-    entryLogFile.println(_id);
+boolean validateLogOutSD(String key) {
+  if(currUserID == key) {
+    return true;
   }
+  else return 0;
+}
+
+
+void writeLogSD(String _vehicle, String _user, String _date, String _time, boolean _start) {
+  entryLogFile = SD.open(entryLog, FILE_WRITE);
+
+  entryLogFile.print(_vehicle);
+  entryLogFile.print(delimitor);
+  entryLogFile.print(_user);
+  entryLogFile.print(delimitor);
+  entryLogFile.print(_date);
+  entryLogFile.print(delimitor);
+  entryLogFile.print(_time);
+  entryLogFile.print(delimitor);
+  if(_start) entryLogFile.println("Log In"); // CHANGE THESE TO LOG IN AND LOG OUT ENTRY INDICATORS TO HTTP POST =======================================================
+  else if(!_start) entryLogFile.println("Log Out");
 
   entryLogFile.close();
 
+  Serial.print(_vehicle);
+  Serial.print(delimitor);
+  Serial.print(_user);
+  Serial.print(delimitor);
   Serial.print(_date);
   Serial.print(delimitor);
-  Serial.print(_time);
-  Serial.print(delimitor);
-  Serial.println(_id);
+  Serial.println(_time);
 }
 
 
-void addAccessSD(String _key) {
-  accessKeysFile = SD.open(accessKeys, FILE_READ);
-  accessKeysFile.println(_key);
-  accessKeysFile.close();
-}
-
-
-
+//void updateAccessKeys(String newKeys) {
+//  if (SD.exists(tempLog)) {
+//    SD.remove(tempLog);
+//    tempLogFile = SD.open(tempLog, FILE_WRITE);
+//
+//  }
+//  if (SD.exists(tempKeys)) {
+//    tempKeysFile = SD.open(tempKeys, FILE_WRITE);
+//  }
+//}
+//
+//
+//void writeTempSD(File tempFile, char temp[], String input) {
+//  if (SD.exists(temp)) {
+//    SD.remove(temp);
+//  }
+//  tempFile = SD.open(temp, FILE_WRITE);
+//
+//  tempFile.print(input);
+//
+//  tempFile.close();
+//
+//}
+//
+//
+//void switchTemp(char file[], File tempFile, char temp[]) {
+//  if (SD.exists(temp)) {
+//    SD.remove(file);
+//    tempFile = SD.open(temp, FILE_WRITE);
+//    tempFile.rename(SD.vwd(), file);
+//    tempFile.close();
+//  }
+//}
 
