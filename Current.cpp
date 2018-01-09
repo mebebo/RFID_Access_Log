@@ -15,7 +15,7 @@ boolean Current::isError() {
   }
 
   float average = total / numReadings;
-Serial.println(average);
+
   // Check against threshold
   if (average <= currThreshold && millis() > 3000) return true;
   else return false;
