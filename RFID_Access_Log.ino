@@ -1,8 +1,8 @@
 String vehicleID = "6";
 
 // Shift register needed for outputs?
-// log out
-// current sensor
+// to EEPROM. vehicle ID, parts broken booleans
+
 
 // time format to database
 
@@ -111,10 +111,13 @@ boolean loggedIn = false;
 String currUserID = "";
 String delimitor = ",";
 
+int errCheckInterval = 1000; // millisec
+unsigned long errCheckTime = errCheckInterval;
+
 
 void setup() {
   Serial.begin(9600);
-//    usbConnect();
+      usbConnect();
 
   SPI.begin();
 
@@ -145,32 +148,33 @@ void setup() {
 
 void loop() {
 
-//  // CHECK RFID CARD ENTRY
-//  if (rfid.PICC_IsNewCardPresent()) {
-//    String keyInput = getUID();
-//    boolean matchID;
-//
-//    if (!loggedIn) {
-//      matchID = validateAccessSD(keyInput);
-//      Serial.print(F("Match ID "));
-//      Serial.println(matchID);
-//
-//      if (matchID) logIn(keyInput);
-//      else rejectAccess(keyInput);
-//    }
-//
-//    else if (loggedIn) {
-//      matchID = validateLogOutSD(keyInput);
-//      Serial.print(F("Match ID "));
-//      Serial.println(matchID);
-//
-//      if (matchID) logOut(keyInput);
-//      else ;
-//    }
-//  }
+  // CHECK RFID CARD ENTRY
+  if (rfid.PICC_IsNewCardPresent()) {
+    String keyInput = getUID();
+    boolean matchID;
 
+    if (!loggedIn) {
+      matchID = validateAccessSD(keyInput);
+      //      Serial.print(F("Match ID "));
+      //      Serial.println(matchID);
+
+      if (matchID) logIn(keyInput);
+      else rejectAccess(keyInput);
+    }
+
+    else if (loggedIn) {
+      matchID = validateLogOutSD(keyInput);
+      //      Serial.print(F("Match ID "));
+      //      Serial.println(matchID);
+
+      if (matchID) logOut(keyInput);
+      else ;
+    }
+  }
+  
   // CHECK AND UPDATE LIGHTS MALFUNCTION
-  if (millis() % 1000 == 0) {
+  if (errCheckTime < millis()) {
+    errCheckTime = millis() + errCheckInterval;
     checkMalfunction(beacon);
   }
 }

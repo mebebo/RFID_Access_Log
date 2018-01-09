@@ -22,7 +22,7 @@ boolean validateAccessSD(String key) {
       }
       else if (ltr == '\n') {
         line = line.substring(0, line.length() - 1);
-        Serial.println(line);
+//        Serial.println(line);
 
         if (key == line) {
           // ID MATCH HERE ====================================================================

@@ -12,7 +12,7 @@ class Current {
 
   private:
     int pin;
-    const static int currCalib = 510;
+    const static int currCalib = 515;
     const static int currThreshold = 3;
 
     boolean broken = false;
