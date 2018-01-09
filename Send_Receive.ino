@@ -1,13 +1,19 @@
+void usbConnect() {
+    while(Serial.available() <= 0) {
+    Serial.print('A');
+    delay(150);
+  }
+}
+
 
 void logIn(String key) {
   digitalWrite(relay, HIGH);
   ledGreen();
   loggedIn = true;
-  //    key.toCharArray(currUserID, 8);
   currUserID = key;
 
   beepAccept();
-  //  writeLogSD(vehicleID, key, rtc.getDateStr(), rtc.getTimeStr(), true);
+    writeLogSD(vehicleID, key, rtc.getDateStr(), rtc.getTimeStr(), true);
   //  Serial.println(F("Access GRANTED"));
 }
 
@@ -32,6 +38,6 @@ void logOut(String key) {
   ledYellow();
 
   beepReject();   // NEW BEEP OUT SOUND
-  //writeLogSD(vehicleID, key, rtc.getDateStr(), rtc.getTimeStr(), false);
+  writeLogSD(vehicleID, key, rtc.getDateStr(), rtc.getTimeStr(), false);
 }
 

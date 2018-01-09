@@ -1,27 +1,45 @@
-//int headlampL = 00000;
-//int headlampR = 00000;
-//int signalL = 00000;
-//int signalR = 00000;
-//int taillampL = 00000;
-//int taillampR = 00000;
-//int beacon = 00000;
-//
-//int currs[] = {headlampL, headlampR, signalL, signalR, taillampL, taillampR, beacon};
-//
-//// Current Values
-//int headlampLVal, headlampRVal, signalLVal, signalRVal, taillampLVal, taillampRVal, beaconVal;
-//// Running booleans
-//boolean headlampLOn, headlampROn, signalLOn, signalROn, taillampLOn, taillampROn, beaconOn;
-//// Error booleans
-//boolean headlampLError, headlampRError, signalLError, signalRError, taillampLError, taillampRError, beaconError;
+boolean brokenBeacon = false;
 
 
+void checkMalfunction(Current lamp) {
+  if (lamp.isError() && !brokenBeacon) {
+    brokenBeacon = true;
 
+    reportMalfunction("6", "00000", "0131313", "25525", lamp);
+    Serial.println("CALISMIY");
+  }
 
+  else if (!lamp.isError() && brokenBeacon) {
+    brokenBeacon = false;
+    reportFix("6", "00000", "0131313", "25525", lamp);
+    Serial.println("DUZELDI");
+  }
+}
 
+void reportMalfunction(String _vehicle, String _sessionID, String _date, String _time, Current lamp) {
 
+  Serial.print(_vehicle);
+  Serial.print(delimitor);
+  Serial.print(_date);
+  Serial.print(delimitor);
+  Serial.print(_time);
+  Serial.print(delimitor);
+  Serial.print(lamp.tag);
+  Serial.print(delimitor);
+  Serial.println(F("$ERR"));
+}
 
+void reportFix (String _vehicle, String _sessionID, String _date, String _time, Current lamp) {
 
-
+  Serial.print(_vehicle);
+  Serial.print(delimitor);
+  Serial.print(_date);
+  Serial.print(delimitor);
+  Serial.print(_time);
+  Serial.print(delimitor);
+  Serial.print(lamp.tag);
+  Serial.print(delimitor);
+  Serial.println(F("$FIX"));
+}
 
 

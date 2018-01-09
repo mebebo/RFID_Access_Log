@@ -1,6 +1,4 @@
-
-
-
+// Greenwich Time
 
 void setRTCTime(String t) {
   // setRTCTime("hh:mm:ss")
@@ -16,19 +14,26 @@ void setRTCTime(String t) {
 }
 
 void setRTCDate(String t) {
-  // setRTCDate("Mon dd yy")
-
+  // setRTCDate("Mon dd yyyy")
   String m;
   int d, y;
 
   m = t.substring(0, t.indexOf(" "));
   t = t.substring(t.indexOf(" ") + 1);
+  t.trim();
   d = t.toInt();
   t = t.substring(t.indexOf(" ") + 1);
   y = t.toInt();
 
   rtc.setDate(d, monthStrNo(m), y);
 }
+
+//void formatTime(String t) {
+//// Current time format: 00:19:59
+//// Current date format: 05.01.2021
+//// Output date time format: "2018-01-06 19:20:06.125254"
+//
+//}
 
 
 int monthStrNo(String months) {

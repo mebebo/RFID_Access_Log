@@ -21,7 +21,7 @@ void ledGreen() {
 }
 
 void ledYellow() {
-  digitalWrite(ledR, HIGH);
+  analogWrite(ledR, 130);
   digitalWrite(ledG, HIGH);
   digitalWrite(ledB, LOW);
 }

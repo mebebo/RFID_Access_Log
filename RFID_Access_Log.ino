@@ -1,11 +1,10 @@
-String vehicleID = "HARLAN-07";
+String vehicleID = "6";
 
 // Shift register needed for outputs?
 // log out
 // current sensor
-// arduino memory to eeprom
-// saat dilimi greenwich
-// active session id variable -> Log Out ID
+
+// time format to database
 
 // SIM MODULE ADDITION
 //  HTML UPDATE FUNCTION
@@ -13,30 +12,6 @@ String vehicleID = "HARLAN-07";
 //  Logged in behaviour
 // Log Out?
 
-
-// FUNCTIONS
-
-// Working offline
-
-// FLOWCHART =============================================================================================
-//1 - ON
-//2 - STANDBY
-//      - LED yellow
-//3 - CARD INPUT
-//      - READING CARD - LED yellow blink (nonblocking, while reading rfid and searching sd card for match)
-//  3a - ACCEPT ENTRY
-//          - LED green
-//          - RELAY on
-//          - PIEZO yes
-//          - SD LOG WRITE
-//  3b - REJECT ENTRY
-//          - LED red
-//          - PIEZO no
-//
-//          - REVERT to STANDBY
-//4 - RUNNING
-//      - LED green
-//      - RELAY on
 
 // SECRET BYPASS SWITCH
 
@@ -49,7 +24,7 @@ String vehicleID = "HARLAN-07";
 // Sync Access Keys
 // Sync Log Entries
 
-// Ability to remotely change server info
+// Ability to remotely change server info?
 
 
 // POSSIBLE PROBLEMS
@@ -61,15 +36,14 @@ String vehicleID = "HARLAN-07";
 
 
 // CURRENT SENSORS
-//#include "Current.h"
+#include "Current.h"
 //
-//Current headlampL("Left Headlight", A0);
-//Current headlampR("Right Headlight", A1);
-//Current signalL("Left Signal Light", A2);
-//Current signalR("Right Signal Light", A3);
-//Current taillampL("Left Tail Light", A4);
-//Current taillampR("Right Tail Light", A5);
-//Current beacon("Beacon Light", 00000);
+//Current headlight(1, 00000);
+//Current stoplight(2, 00000);
+Current beacon(3, A1);
+//Current signalL(4, 00000);
+//Current signalR(5, 00000);
+
 
 #include <SPI.h>
 
@@ -105,7 +79,7 @@ DS1302 rtc(rsPin, datPin, clkPin);
 
 // PINOUT
 int relay = 8;
-int piezo = 3;                                    // PWM
+int piezo = 3;                            // PWM
 int ledR = 5, ledG = 6, ledB = 00000;     // PWM * 3
 
 //2 CLK1
@@ -128,19 +102,20 @@ int ledR = 5, ledG = 6, ledB = 00000;     // PWM * 3
 //16
 //17
 
-
-//
 //Shiftables: RELAY, ledR, ledG, ledB
 
 
-boolean setDateNTime = true;
+boolean setDateNTime = false;
 
 boolean loggedIn = false;
-
 String currUserID = "";
+String delimitor = ",";
+
 
 void setup() {
   Serial.begin(9600);
+//    usbConnect();
+
   SPI.begin();
 
   pinMode(relay, OUTPUT);
@@ -163,34 +138,40 @@ void setup() {
     setRTCTime(__TIME__);
     setRTCDate(__DATE__);
   }
+
+  currUserID.reserve(10);
 }
 
 
 void loop() {
 
-  if (rfid.PICC_IsNewCardPresent()) {
-    String keyInput = getUID();
-//    Serial.print("Current Input: ");
-//    Serial.println(keyInput);
-    boolean matchID;
+//  // CHECK RFID CARD ENTRY
+//  if (rfid.PICC_IsNewCardPresent()) {
+//    String keyInput = getUID();
+//    boolean matchID;
+//
+//    if (!loggedIn) {
+//      matchID = validateAccessSD(keyInput);
+//      Serial.print(F("Match ID "));
+//      Serial.println(matchID);
+//
+//      if (matchID) logIn(keyInput);
+//      else rejectAccess(keyInput);
+//    }
+//
+//    else if (loggedIn) {
+//      matchID = validateLogOutSD(keyInput);
+//      Serial.print(F("Match ID "));
+//      Serial.println(matchID);
+//
+//      if (matchID) logOut(keyInput);
+//      else ;
+//    }
+//  }
 
-    if (!loggedIn) {
-      matchID = validateAccessSD(keyInput);
-      Serial.print(F("Match ID "));
-      Serial.println(matchID);
-
-      if (matchID) logIn(keyInput);
-      else rejectAccess(keyInput);
-    }
-
-    else if (loggedIn) {
-      matchID = validateLogOutSD(keyInput);
-      Serial.print(F("Match ID "));
-      Serial.println(matchID);
-
-      if(matchID) logOut(keyInput);
-      else ;
-    }
+  // CHECK AND UPDATE LIGHTS MALFUNCTION
+  if (millis() % 1000 == 0) {
+    checkMalfunction(beacon);
   }
 }
 

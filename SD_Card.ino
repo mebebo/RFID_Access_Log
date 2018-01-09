@@ -1,6 +1,5 @@
 
 
-String delimitor = ",";
 
 void initSD() {
   if (SD.begin(sdCSPin)) Serial.println(F("SD Card Initialized"));
@@ -9,6 +8,7 @@ void initSD() {
 
 boolean validateAccessSD(String key) {
   String line = "";
+  line.reserve(10);
   Serial.println(F("Stored Access Keys: "));
 
   if (SD.exists(accessKeys)) {
@@ -42,7 +42,7 @@ boolean validateAccessSD(String key) {
 
 
 boolean validateLogOutSD(String key) {
-  if(currUserID == key) {
+  if (currUserID == key) {
     return true;
   }
   else return 0;
@@ -60,8 +60,8 @@ void writeLogSD(String _vehicle, String _user, String _date, String _time, boole
   entryLogFile.print(delimitor);
   entryLogFile.print(_time);
   entryLogFile.print(delimitor);
-  if(_start) entryLogFile.println("Log In"); // CHANGE THESE TO LOG IN AND LOG OUT ENTRY INDICATORS TO HTTP POST =======================================================
-  else if(!_start) entryLogFile.println("Log Out");
+  if (_start) entryLogFile.println(_start); // CHANGE THESE TO LOG IN AND LOG OUT ENTRY INDICATORS TO HTTP POST =======================================================
+  else if (!_start) entryLogFile.println(_start);
 
   entryLogFile.close();
 
@@ -71,7 +71,11 @@ void writeLogSD(String _vehicle, String _user, String _date, String _time, boole
   Serial.print(delimitor);
   Serial.print(_date);
   Serial.print(delimitor);
-  Serial.println(_time);
+  Serial.print(_time);
+  Serial.print(delimitor);
+  Serial.print(_start);
+  Serial.print(delimitor);
+  Serial.println(F("$LOG"));
 }
 
 
