@@ -77,6 +77,10 @@ int rsPin = 2, datPin = 4, clkPin = 7;
 DS1302 rtc(rsPin, datPin, clkPin);
 
 
+// BUTTON CONTROL
+int buttonRelay = 9;
+
+
 // PINOUT
 int relay = 8;
 int piezo = 3;                            // PWM
@@ -133,6 +137,8 @@ void setup() {
   digitalWrite(rfidCSPin, HIGH);
   digitalWrite(relay, LOW);
 
+  pinMode(buttonRelay, INPUT_PULLUP);
+
   initLedPins(ledR, ledG, ledB);
   initSD();
   initRFID();
@@ -177,6 +183,9 @@ void loop() {
     errCheckTime = millis() + errCheckInterval;
     checkMalfunction(beacon);
   }
+
+  if(digitalRead(buttonRelay) == LOW) digitalWrite(relay, LOW);
+
 }
 
 
