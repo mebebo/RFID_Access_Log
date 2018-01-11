@@ -184,7 +184,10 @@ void loop() {
     checkMalfunction(beacon);
   }
 
-  if(digitalRead(buttonRelay) == LOW) digitalWrite(relay, LOW);
+  if(digitalRead(buttonRelay) == LOW) {
+    if(loggedIn) logOut(currUserID);
+    digitalWrite(relay, LOW);
+  }
 
 }
 
