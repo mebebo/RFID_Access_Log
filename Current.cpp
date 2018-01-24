@@ -13,7 +13,6 @@ boolean Current::isError() {
     int curVal = analogRead(pin) - currCalib;
     total += curVal;
   }
-
   float average = total / numReadings;
 
   // Check against threshold
@@ -22,9 +21,6 @@ boolean Current::isError() {
 }
 
 
-void Current::state(boolean out) {
-  broken = out;
-}
 
 
 

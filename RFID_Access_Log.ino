@@ -1,24 +1,15 @@
-String vehicleID = "6";
-
 // Shift register needed for outputs?
 // to EEPROM. vehicle ID, parts broken booleans
 
-
-// time format to database
+// LED COLOR
 
 // SIM MODULE ADDITION
 //  HTML UPDATE FUNCTION
-
-//  Logged in behaviour
-// Log Out?
-
 
 // SECRET BYPASS SWITCH
 
 
 // Online updates - Transmit & Receive
-
-// Set date + time
 
 // SD Card
 // Sync Access Keys
@@ -33,14 +24,37 @@ String vehicleID = "6";
 // RFID Reading Error
 // Date + Time Timezone Errors
 
+//2 CLK1
+//3o PIEZO
+//4 CLK2
+//5o LED R
+//6o LED G
+//7 CLK3
+//8 RELAY
+//9o BTN_ENGINE
+//10 CS SD
+//11 SPI
+//12 SPI
+//13 SPI
+//18 RES RFID
+//19 CS RFID
+//
+//14 CURR HEAD
+//15 CURR STOP
+//16 CURR SIGNAL
+//17 BTN_LIGHTS
 
+//Shiftables: RELAY, ledR, ledG, ledB, BTN_ENGINE, BTN_LIGHTS
+
+
+String vehicleID = "6";
 
 // CURRENT SENSORS
 #include "Current.h"
 //
-//Current headlight(1, 00000);
-//Current stoplight(2, 00000);
-Current beacon(3, A1);
+Current headlight(1, A0);
+Current stoplight(2, A1);
+Current beacon(3, A2);
 //Current signalL(4, 00000);
 //Current signalR(5, 00000);
 
@@ -78,7 +92,7 @@ DS1302 rtc(rsPin, datPin, clkPin);
 
 
 // BUTTON CONTROL
-int buttonRelay = 9;
+int buttonEngine = 9;
 
 
 // PINOUT
@@ -86,42 +100,21 @@ int relay = 8;
 int piezo = 3;                            // PWM
 int ledR = 5, ledG = 6, ledB = 00000;     // PWM * 3
 
-//2 CLK1
-//3o PIEZO
-//4 CLK2
-//5o LED R
-//6o LED G
-//7 CLK3
-//8 RELAY
-//9o
-//10 CS SD
-//11 SPI
-//12 SPI
-//13 SPI
-//18 RES RFID
-//19 CS RFID
-//
-//14
-//15
-//16
-//17
-
-//Shiftables: RELAY, ledR, ledG, ledB
-
-
 boolean setDateNTime = false;
 
 boolean loggedIn = false;
+unsigned long buttonDebounceTime;
+int buttonDebounce = 200;
 String currUserID = "";
 String delimitor = ",";
 
-int errCheckInterval = 1000; // millisec
+int errCheckInterval = 2000; // millisec
 unsigned long errCheckTime = errCheckInterval;
 
 
 void setup() {
   Serial.begin(9600);
-      usbConnect();
+  usbConnect();
 
   SPI.begin();
 
@@ -137,7 +130,7 @@ void setup() {
   digitalWrite(rfidCSPin, HIGH);
   digitalWrite(relay, LOW);
 
-  pinMode(buttonRelay, INPUT_PULLUP);
+  pinMode(buttonEngine, INPUT_PULLUP);
 
   initLedPins(ledR, ledG, ledB);
   initSD();
@@ -154,41 +147,43 @@ void setup() {
 
 void loop() {
 
-  // CHECK RFID CARD ENTRY
-  if (rfid.PICC_IsNewCardPresent()) {
-    String keyInput = getUID();
-    boolean matchID;
+  if (!loggedIn) {
+    // CHECK RFID CARD ENTRY
+    if (rfid.PICC_IsNewCardPresent()) {
+      String keyInput = getUID();
+      boolean matchID;
 
-    if (!loggedIn) {
-      matchID = validateAccessSD(keyInput);
-      //      Serial.print(F("Match ID "));
-      //      Serial.println(matchID);
+      if (!loggedIn) {
+        matchID = validateAccessSD(keyInput);
+        if (matchID) logIn(keyInput);
+        else rejectAccess(keyInput);
 
-      if (matchID) logIn(keyInput);
-      else rejectAccess(keyInput);
-    }
+        errCheckTime = millis() + errCheckInterval;
+      }
 
-    else if (loggedIn) {
-      matchID = validateLogOutSD(keyInput);
-      //      Serial.print(F("Match ID "));
-      //      Serial.println(matchID);
-
-      if (matchID) logOut(keyInput);
-      else ;
+      //    else if (loggedIn) {
+      //      matchID = validateLogOutSD(keyInput);
+      //      if (matchID) logOut(keyInput);
+      //      else ;
+      //    }
     }
   }
-  
+
   // CHECK AND UPDATE LIGHTS MALFUNCTION
-  if (errCheckTime < millis()) {
-    errCheckTime = millis() + errCheckInterval;
-    checkMalfunction(beacon);
+  else if (loggedIn) {
+    if (errCheckTime < millis()) {
+      errCheckTime = millis() + errCheckInterval;
+      checkMalfunction(headlight);
+      checkMalfunction(stoplight);
+      checkMalfunction(beacon);
+    }
   }
 
-  if(digitalRead(buttonRelay) == LOW) {
-    if(loggedIn) logOut(currUserID);
+  if (digitalRead(buttonEngine) == LOW && buttonDebounceTime < millis()) {
+    buttonDebounceTime = millis() + buttonDebounce;
+    if (loggedIn) logOut(currUserID);
     digitalWrite(relay, LOW);
   }
-
 }
 
 

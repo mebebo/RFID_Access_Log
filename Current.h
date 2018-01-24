@@ -7,15 +7,13 @@ class Current {
   public:
     Current(int _tag, int _pin);
     boolean isError();
-    void state(boolean out);
     int tag;
+    boolean broken;
 
   private:
     int pin;
-    const static int currCalib = 515;
-    const static int currThreshold = 3;
-
-    boolean broken = false;
+    const static int currCalib = 512;
+    const static int currThreshold = 2;
 
     int total;
     static const int numReadings = 10;

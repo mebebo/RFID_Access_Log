@@ -1,6 +1,4 @@
 
-
-
 void initLedPins(int r, int g, int b) {
   pinMode(r, OUTPUT);
   pinMode(g, OUTPUT);
@@ -21,8 +19,8 @@ void ledGreen() {
 }
 
 void ledYellow() {
-  analogWrite(ledR, 130);
-  digitalWrite(ledG, HIGH);
+  digitalWrite(ledR, HIGH);
+  analogWrite(ledG, 100);
   digitalWrite(ledB, LOW);
 }
 

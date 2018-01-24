@@ -1,5 +1,4 @@
 
-
 void initRFID() {
   rfid.PCD_Init(rfidCSPin, rfidRstPin);
   Serial.println(F("RFID Initialized"));

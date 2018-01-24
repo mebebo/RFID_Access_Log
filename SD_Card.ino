@@ -1,6 +1,5 @@
 
 
-
 void initSD() {
   if (SD.begin(sdCSPin)) Serial.println(F("SD Card Initialized"));
   else Serial.println(F("SD Card Initialization Failed"));
@@ -9,7 +8,7 @@ void initSD() {
 boolean validateAccessSD(String key) {
   String line = "";
   line.reserve(10);
-  Serial.println(F("Stored Access Keys: "));
+//  Serial.println(F("Stored Access Keys: "));
 
   if (SD.exists(accessKeys)) {
     accessKeysFile = SD.open(accessKeys, FILE_READ);
@@ -41,12 +40,12 @@ boolean validateAccessSD(String key) {
 }
 
 
-boolean validateLogOutSD(String key) {
-  if (currUserID == key) {
-    return true;
-  }
-  else return 0;
-}
+//boolean validateLogOutSD(String key) {
+//  if (currUserID == key) {
+//    return true;
+//  }
+//  else return 0;
+//}
 
 
 void writeLogSD(String _vehicle, String _user, String _date, String _time, boolean _start) {
